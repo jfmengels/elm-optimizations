@@ -1,6 +1,6 @@
 ## Elm optimization ideas
 
-Over the years, I have written down a number of ideas on how to make Elm code faster, and I figured out these should be shared.
+Over the years, I have written down a number of ideas on how to make Elm code faster, and I figured these should be shared.
 
 That way, these ideas can be discussed, tested or implemented, either for Elm or for similar languages.
 Ultimately, the real discussion will have to be in the related repository (compiler or package).
