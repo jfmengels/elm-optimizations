@@ -74,7 +74,7 @@ Note: This version likely doesn't respect the invariants of red-black trees, and
 
 [PR for `miniBill/elm-fast-dict`](https://github.com/miniBill/elm-fast-dict/pull/5) where the same idea has been applied, but I failed to respect the invariants of the tree. Maybe there's an answer on how to do that in https://en.m.wikipedia.org/wiki/Red%E2%80%93black_tree#Set_operations_and_bulk_operations
 
-In that package, this function also seemed to perform really well compared to its previous implementation and against `elm/core`'s version.
+In that package, the following version also performs really well compared to its previous implementation and against `elm/core`'s version, and is what is being used in the package now ([PR](https://github.com/miniBill/elm-fast-dict/pull/11)).
 
 ```elm
 filter : (comparable -> a -> Bool) -> Dict comparable a -> Dict comparable a
