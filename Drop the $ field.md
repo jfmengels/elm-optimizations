@@ -71,6 +71,23 @@ if (_v0.a) { // User
 
 lue suggested that we could compare with `undefined` instead of checking for falsiness, as `undefined` is never created elsewhere in Elm. It is more verbose but doesn't require knowing the contents of the types (ideal for `Maybe` for instance where the type is unknown).
 
+## Pattern matches
+
+This does make compiling a pattern match to a `switch` hard, as it uses this.
+
+```js
+switch (x.$) {
+	case 0: ...
+	case 2: ...
+	default: ...
+```
+
+This should be good enough for patterns like `Maybe` but hard when there are more variants.
+
+I see two options when there are multiple variants all with a different number of arguments:
+- we could apply this optimization on the condition that we do not find any pattern matches on the type that we can't resolve through `=== undefined` checks.
+- we go away from using `switch` for (some) pattern matches. In that case, maybe [[Elm optimization - Avoid redundant checks in pattern matches (like Gleam)]] can be a good resource to look at.
+
 ---
 
 This becomes less and less applicable when there are more constructors, because if some of them have the same arity then this isn't possible, we need `$` again.
