@@ -28,7 +28,7 @@ function _List_appendToLiteral(jsArray, elmList)
 
 ---
 
-I made quite a few benchmark explorations recently, and here is what I came up. 
+I made quite a few benchmark explorations recently, and here is what I came up.
 
 
 ### Merge all List.map together, merge all List.filter together, etc.
@@ -40,15 +40,13 @@ I made quite a few benchmark explorations recently, and here is what I came up.
 	|> List.map fn5
 ```
 
-This shows [nice performance improvements](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/ListFusion.elm)
+This shows [nice performance improvements](https://github.com/jfmengels/elm-benchmarks/blob/main/src/WhatIsFaster/ListFusion.elm) (but I somehow deleted the benchmark?)
 
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/ListFusion-Results-Chrome.png)
-
-As shown in a different benchmark, function composition [is pretty slow](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/FunctionComposition.elm), so the transformation can be made even more performant.
+As shown in a different benchmark, function composition [is pretty slow](https://github.com/jfmengels/elm-benchmarks/blob/main/src/WhatIsFaster/FunctionComposition.elm), so the transformation can be made even more performant.
 (Btw, in almost all benchmarks in [`jfmengels/elm-benchmarks`](https://github.com/jfmengels/elm-benchmarks) I provide a screenshot of benchmark results in a file next to it, please check them out)
 
 This optimization, which I've heard named "stream fusion" could be a proposal on its own (but this is just an initial exploration draft). Among other questions, we could ponder which functions could/should support this, whether it makes sense to enable this for custom functions and data structures (or only for core elements), and if so how developers could let the compiler/optimizer know about this. You will notice the same questions apply to pretty much for every proposal here.
- 
+
 Then we can have multiple optimizations, which I think are all pretty interesting, some extremely so.
 
 ### Using native JS operations
@@ -106,9 +104,9 @@ var $author$project$Api$someValue = A2(
 		_mutatingJsArrayMap(fn1, ['1', '2'])));
 ```
 
-[I benchmarked this](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/OpportunisticJsArrayLoop.elm) and the results are pretty wild.
+[I benchmarked this](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/OpportunisticJsArrayLoop.elm) and the results are pretty wild.
 
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/OpportunisticJsArrayLoop-Results-Chrome.png)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/OpportunisticJsArrayLoop-Results-Chrome.png)
 
 The cost of this is an additional function to add to the bundle (for every function that we want to make use of this, and for which we found a need to use it).
 
@@ -170,9 +168,9 @@ var $author$project$Api$someValue =
 				['1', '2']));
 ```
 
-Here is a [benchmark on a simple List.map call](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/NativeMapAndFromArray.elm):
+Here is a [benchmark on a simple List.map call](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/NativeMapAndFromArray.elm):
 
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/NativeMapAndFromArray-Results-Chrome.png)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/NativeMapAndFromArray-Results-Chrome.png)
 
 ### Skip List_JsFromArray entirely
 
@@ -186,9 +184,9 @@ $elm$core$Set$fromList(
 
 Another `_List_fromArray`. Anytime you need to create a `Set`, you take the JavaScript Array, fold over it to turn it into a `List`, then loop over it again to turn it into a `Set`.
 
-We can make this faster by creating a [dedicated function](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/SetFromLiteral.elm) function [(~10%-30% faster)](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/SetFromLiteral-Results-Chrome.png).
+We can make this faster by creating a [dedicated function](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/SetFromLiteral.elm) function [(~10%-30% faster)](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/SetFromLiteral-Results-Chrome.png).
 
-And then we can do the same thing for [`Dict`](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/DictFromLiteral.png), and `Array`, and more?
+And then we can do the same thing for [`Dict`](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/DictFromLiteral.png), and `Array`, and more?
 
 ### Making use of native functions in other places
 
@@ -305,11 +303,11 @@ _List_fromArray(
 
 I previously mentioned that we can use mutating functions on the JS arrays. Well, in some cases, we could also do that on Elm Lists. For instance, since the core `List.map` functions creates a new list with a new reference, mutating this one will have no noticeable impact (if it's not referenced elsewhere). So if you have `list |> List.map fn |> List.filter`, you can use a mutating version of `List.filter` that works on Elm `List`.
 
-And these versions are so much faster! I made benchmarks for a mutating [`List.filter`](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListFilter.elm), [`List.take`](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListTake.elm) and [`List.map`](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListMap.elm), but this applies to I think most List functions, and likely even more.
+And these versions are so much faster! I made benchmarks for a mutating [`List.filter`](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListFilter.elm), [`List.take`](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListTake.elm) and [`List.map`](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListMap.elm), but this applies to I think most List functions, and likely even more.
 
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListFilter-Results-Chrome.png)
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListTake-Results-Chrome.png)
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/MutationExploration/ListMap-Results-Chrome.png)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListFilter-Results-Chrome.png)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListTake-Results-Chrome.png)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/MutationExploration/ListMap-Results-Chrome.png)
 
 Thanks to Roc for inspiring this idea! (yay, mutual inspiration!)
 
@@ -398,7 +396,7 @@ _List_mapThenFilter mapper predicate list =
 This improves the performance, very likely to similar levels than stream fusion (no benchmarks for this one though, sorry).
 
 We could have this function applied for plenty of other combinations, even a simple "filter then map" would work, or "map then filter then map", or
-["indexMap Tuple.pair + List.filterMap"](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/IndexMap.elm) (this one I have a benchmark for!).
+["indexMap Tuple.pair + List.filterMap"](https://github.com/jfmengels/elm-benchmarks/blob/main/src/WhatIsFaster/IndexMap.elm) (this one I have a benchmark for!).
 
 ```elm
 _List_filterThenMap predicate mapper list =

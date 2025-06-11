@@ -1,8 +1,8 @@
 [[Elm optimization techniques]]
 
-Function composition can be surprisingly slow ([benchmark](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/FunctionComposition.elm))
+Function composition can be surprisingly slow ([benchmark](https://github.com/jfmengels/elm-benchmarks/blob/main/src/WhatIsFaster/FunctionComposition.elm))
 
-![](https://github.com/jfmengels/elm-benchmarks/blob/master/src/WhatIsFaster/FunctionComposition-Results-Chrome.png?raw=true)
+![](https://github.com/jfmengels/elm-benchmarks/blob/main/src/WhatIsFaster/FunctionComposition-Results-Chrome.png?raw=true)
 
 There are multiple ways to improve this.
 

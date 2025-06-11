@@ -47,7 +47,7 @@ Elm Lists will have to be supported still, because this transformer will not be 
 
 ## Benchmark
 
-[Benchmark](https://github.com/jfmengels/elm-benchmarks/blob/master/src/NativeJsArrayExploration/ArraysForHtml.elm)
+[Benchmark](https://github.com/jfmengels/elm-benchmarks/blob/main/src/NativeJsArrayExploration/ArraysForHtml.elm)
 
 The results indicate a 60% performance increase on Chrome, and a 50% increase on Firefox.
 
