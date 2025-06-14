@@ -1,8 +1,8 @@
 [[Elm optimization techniques]]
 
-✅ Implemented through a minifier. See [[#Minifiers]].
-
 **This has been explored in the `FallthroughExploration` folder of `elm-benchmarks`. The results are very mixed: Sometimes much better for small inputs but much worse for large inputs.**
+
+This may be best solved through [[Elm optimization - Avoid redundant checks in pattern matches (like Gleam)]].
 
 ---
 
@@ -11,8 +11,8 @@ fn x y =
   if condition x then
     if condition y then
 	    Just (x, y)
-		else
-			Nothing
+	else
+		Nothing
   else
     Nothing
 ```
@@ -176,9 +176,10 @@ var map5 = F6(
 
 - Finding these optimizations could require plenty of checks, a combinatorial number of those.
 - Depending on how smart the optimizer is, this could be quite a brittle optimization. For better or worse, users will likely not notice this though.
+
 ## Minifiers
 
-It seems that minifiers (`uglifyjs` at least) alters branches with the same code to use the same body.
+It seems that minifiers (`uglifyjs` at least) sometimes alters branches with the same code to use the same body.
 
 ```js
 case 0:
@@ -195,4 +196,4 @@ case 1:
 
 I don't know how much work it puts into figuring this optimization, nor whether it re-orders the branches to optimize for this possibility.
 
-I consider this feature to be completed when using a minifier.
+When code gets sufficiently complex, minifiers don't do this either, so they might need a bit of help.
