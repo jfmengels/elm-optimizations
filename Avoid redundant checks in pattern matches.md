@@ -1,8 +1,78 @@
 [[Elm optimization techniques]]
 
-Inspired from the release in Gleam 1.11.
+Inspired from the [Gleam 1.11 release](https://gleam.run/news/gleam-javascript-gets-30-percent-faster/).
 
----
+## Analysis
+
+Elm already has a decision tree and it already does try to avoid redundant checks.
+
+Elm's implementation is based on [When Do Match-Compilation Heuristics Matter?​](https://www.cs.tufts.edu/~nr/cs257/archive/norman-ramsey/match.pdf).
+- [compiler/compiler/src/Optimize/DecisionTree.hs at master · elm/compiler · GitHub](https://github.com/elm/compiler/blob/master/compiler/src/Optimize/DecisionTree.hs)
+- Generate decider: https://github.com/elm/compiler/blob/master/compiler/src/Generate/JavaScript/Expression.hs#L844
+
+Gleam's implementation is based on ["How to compile pattern matching"](https://julesjacobs.com/notes/patternmatching/patternmatching.pdf) (which refers to [When Do Match-Compilation Heuristics Matter?​](https://www.cs.tufts.edu/~nr/cs257/archive/norman-ramsey/match.pdf) that Elm uses).
+
+I have not yet grasped whether one implementation is better than the other, not whether Gleam's implementation removes more redundant checks.
+
+## Comments on the Gleam generated code
+
+```elm
+case Ok(["a", "b c", "d"]) {
+  Ok(["a", "b " <> _, "d"]) -> 1
+  _ -> 1
+}
+```
+
+In Gleam, [the above](https://github.com/giacomocavalieri/gleam/blob/2117dbc5476765599d8d182fcc4a3fd75af8b36e/compiler-core/src/javascript/tests/case.rs) compiles to this [code](https://github.com/giacomocavalieri/gleam/blob/2117dbc5476765599d8d182fcc4a3fd75af8b36e/compiler-core/src/javascript/tests/snapshots/gleam_core__javascript__tests__case__nested_string_prefix_match.snap):
+
+```js
+let $1 = $[0];
+if ($1 instanceof $Empty) {
+  return 1;
+} else {
+  let $2 = $1.tail;
+  if ($2 instanceof $Empty) {
+    return 1;
+  } else {
+    let $3 = $2.tail;
+    if ($3 instanceof $Empty) {
+      return 1;
+    } else {
+      let $4 = $3.tail;
+      if ($4 instanceof $Empty) {
+        let $5 = $3.head;
+        if ($5 === "d") {
+          let $6 = $2.head;
+          if ($6.startsWith("b ")) {
+            let $7 = $1.head;
+            if ($7 === "a") {
+              return 1;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
+        } else {
+          return 1;
+        }
+      } else {
+        return 1;
+      }
+    }
+  }
+}
+```
+
+This has a lot of `else { return 1; }` statements (which is not super clear here but is the default case).
+
+While that is fine for such a small expression, if the default case is a giant expression, then that giant expression gets repeated a lot too, which leads to bigger compile sizes and probably less JIT optimizations.
+
+Elm's implementation avoids this by using continue ("go to") statements.
+
+## Original announcement
+
+<details>
 Extracted from [Gleam JavaScript gets 30% faster](https://gleam.run/news/gleam-javascript-gets-30-percent-faster/)
 
 Gleam has a single flow control construct, the case expression. It runs top-to-bottom checking to see which of the given patterns match the value.
@@ -81,3 +151,4 @@ case payload {
 Efficient compilation of pattern matching is a surprisingly challenging problem, and we would not have had so much success without academic research on the subject. In particular we would like to acknowledge ["How to compile pattern matching"](https://julesjacobs.com/notes/patternmatching/patternmatching.pdf), by Jules Jacobs and ["Efficient manipulation of binary data using pattern matching"](https://user.it.uu.se/~kostis/Papers/JFP_06.pdf), by Per Gustafsson and Konstantinos Sagonas. Thank you.
 
 This is the culmination of work that was started before Gleam v1, and has been desired for much longer. A huge thank you to [Giacomo Cavalieri](https://github.com/giacomocavalieri) for this final piece.
+</details>
